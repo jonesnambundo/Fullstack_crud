@@ -58,67 +58,32 @@ Este projeto implementa uma API para um sistema de e-commerce com funcionalidade
 
 ---
 ## Como Rodar o Projeto
+Clonar o repositório do GitHub:
+
+git clone https://github.com/jonesnambundo/Fullstack_crud.git
+
+Entrar na pasta do Frontend:
+cd FrontEnd
+
+Instalar as dependências do frontend:
+npm i
+
+Iniciar o servidor de desenvolvimento do frontend:
+npm run dev
 
 ### Backend
+Criar um ambiente virtual para o Python:python3 
+-m venv venv
 
-1. Clone este repositório:
-    ```bash
-    git clone https://github.com/username/repository-name.git
-    ```
+Ativar o ambiente virtual:
+.\venv\Scripts\activate
 
-2. Acesse a pasta do projeto:
-    ```bash
-    cd repository-name
-    ```
+Instalar as dependências do backend:
+pip install -r requirements.txt
 
-3. Crie um ambiente virtual:
-    ```bash
-    python3 -m venv venv
-    ```
-
-4. Ative o ambiente virtual:
-    - **Windows**:
-      ```bash
-      .\venv\Scripts\activate
-      ```
-    - **Linux/macOS**:
-      ```bash
-      source venv/bin/activate
-      ```
-
-5. Instale as dependências:
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-6. Inicie o servidor Flask:
-    ```bash
-    flask run
-    ```
-   O servidor estará disponível em `http://127.0.0.1:5000/`.
-
-### Frontend
-
-1. Acesse o diretório do frontend:
-    ```bash
-    cd frontend
-    ```
-
-2. Instale as dependências:
-    ```bash
-    npm install
-    ```
-
-3. Inicie o servidor de desenvolvimento:
-    ```bash
-    npm start
-    ```
-
-4. O dashboard estará disponível em `http://localhost:3000/`.
-
----
-
-## Como Usar
+Rodar o servidor do Flask:
+python app.py
+O servidor estará disponível em http://127.0.0.1:5000/.
 
 ### API
 
@@ -137,29 +102,5 @@ Este projeto implementa uma API para um sistema de e-commerce com funcionalidade
 - **Resumo de Vendas**:
   Envie uma requisição `GET` para `/sales/summary` com o parâmetro `group_by` (opções: `month`, `week`, `year`).
 
-### Frontend
 
-- **Dashboard**:
-  No dashboard, você pode visualizar gráficos de vendas, total de vendas, quantidade de vendas e lucro mensal.
 
-- **Adicionar, Editar e Deletar Produtos**:
-  Através do painel de controle, você pode criar, editar e remover produtos.
-
-- **Exportar Dados**:
-  Você pode exportar os dados de produtos e vendas para arquivos CSV.
-
----
-
-## Contribuição
-
-1. Faça um fork deste repositório.
-2. Crie uma branch para sua feature (`git checkout -b feature-nome`).
-3. Commit suas mudanças (`git commit -m 'Add new feature'`).
-4. Envie para o branch principal (`git push origin feature-nome`).
-5. Abra um Pull Request.
-
----
-
-## Licença
-
-Este projeto está licenciado sob a [MIT License](LICENSE).
