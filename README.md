@@ -37,20 +37,19 @@ Este projeto implementa uma API para um sistema de e-commerce com funcionalidade
 
 ### Frontend (Dashboard)
 
-1. **Visualização de Produtos**:
-   - Exibição de lista de produtos com filtros por nome, descrição e categoria.
-   - Ações para editar, remover e visualizar detalhes dos produtos.
-   - ![Image](https://github.com/user-attachments/assets/df9bc2d9-803c-4d42-b45c-fd5697e5ae36)
-   
-2. **Dashboard de Vendas**:
+1. **Dashboard de Vendas**:
    - Visualização das vendas totais e quantidade de produtos vendidos.
    - Gráficos para exibição de vendas e lucro mensal.
-   - Exportação de dados de vendas e produtos via CSV.
+     ![Image](https://github.com/user-attachments/assets/df9bc2d9-803c-4d42-b45c-fd5697e5ae36)
+ 
+2. **Lsita de Productos**:
+   - Exibição de lista de produtos, com opção de Exportar os produtos , Adicionar produtos, Visualizar Remover e editar.
    - ![Image](https://github.com/user-attachments/assets/8b3a13c5-d6fc-4918-955b-37d8b15a68e4)
-   
-3. **Formulários**:
-   - Formulários para criação e edição de produtos e vendas.
-   - Suporte para upload de produtos e vendas via CSV.
+  
+3. Products Sales
+   Premite importar um ficheiro Csv de Sales oou adicionar individualmente.
+   Permite acoes como editar , visualizar e remover Para adicionar produtos via CSV , (importar produtos) ou crear individualmente.
+   ![Image](https://github.com/user-attachments/assets/b939997c-0747-4fbf-9aa4-095bc494873f)
    
 4. **Autenticação**:
    - Páginas de login, cadastro e recuperação de senha.
@@ -58,7 +57,6 @@ Este projeto implementa uma API para um sistema de e-commerce com funcionalidade
      ![Image](https://github.com/user-attachments/assets/e859f2b1-e80f-4a70-b39e-f6d1725d9113)
 
 ---
-
 ## Como Rodar o Projeto
 
 ### Backend
