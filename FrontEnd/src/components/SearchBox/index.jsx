@@ -7,7 +7,7 @@ export const SearchBox = () => {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/products`, {
+      const response = await axios.get(`https://api-ap.onrender.com//products`, {
         params: { query: searchQuery }
       });
       console.log('Results:', response.data);
