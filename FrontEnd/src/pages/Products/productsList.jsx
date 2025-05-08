@@ -50,7 +50,7 @@ export const ProductsList = () => {
 
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/products");
+        const response = await fetch("https://api-ap.onrender.com/products");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -72,7 +72,7 @@ export const ProductsList = () => {
   };
 
   const handleExport = () => {
-    fetch("http://127.0.0.1:5000/products/download_csv")
+    fetch("https://api-ap.onrender.com/products/download_csv")
       .then((response) => response.blob())
       .then((blob) => {
         const url = window.URL.createObjectURL(blob);
@@ -90,7 +90,7 @@ export const ProductsList = () => {
 
   const handleAddProduct = async (newProductData) => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/products", {
+      const response = await fetch("https://api-ap.onrender.com/products", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -113,7 +113,7 @@ export const ProductsList = () => {
 
   const handleEditProduct = async (id, updatedProductData) => {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/products/${id}`, {
+      const response = await fetch(`https://api-ap.onrender.com/products/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -137,7 +137,7 @@ export const ProductsList = () => {
 
   const handleRemoveProduct = async (id) => {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/products/${id}`, {
+      const response = await fetch(`https://api-ap.onrender.com/products/${id}`, {
         method: "DELETE",
       });
       if (!response.ok) {
