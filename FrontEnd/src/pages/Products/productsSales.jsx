@@ -27,7 +27,7 @@ export const ProductSales = () => {
 
     const fetchSales = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/sales");
+        const response = await fetch("https://api-ap.onrender.com/sales");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -46,7 +46,7 @@ export const ProductSales = () => {
 
   const handleAddSale = async (newSaleData) => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/sales", {
+      const response = await fetch("https://api-ap.onrender.com/sales", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,7 +68,7 @@ export const ProductSales = () => {
 
   const handleEditSale = async (id, updatedSaleData) => {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/sales/${id}`, {
+      const response = await fetch(`https://api-ap.onrender.com/sales/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -90,7 +90,7 @@ export const ProductSales = () => {
 
   const handleRemoveSale = async (id) => {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/sales/${id}`, {
+      const response = await fetch(`https://api-ap.onrender.com/sales/${id}`, {
         method: "DELETE",
       });
       if (!response.ok) {
@@ -132,7 +132,7 @@ export const ProductSales = () => {
 
         try {
           const response = await fetch(
-            "http://127.0.0.1:5000/sales/upload_csv",
+            "https://api-ap.onrender.com/sales/upload_csv",
             {
               method: "POST",
               body: formData,
