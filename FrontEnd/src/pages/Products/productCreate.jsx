@@ -98,7 +98,7 @@ export const ProductCreate = () => {
     };
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/products", {
+      const response = await fetch("https://api-ap.onrender.com/products", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -143,7 +143,7 @@ export const ProductCreate = () => {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:5000/products/upload_csv",
+        "https://api-ap.onrender.com/products/upload_csv",
         {
           method: "POST",
           body: formData,
