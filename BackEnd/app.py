@@ -60,7 +60,7 @@ with app.app_context():
             db.session.add(Category(id=id_, name=name))
         db.session.commit()
         
-    sales_data = pd.read_csv('./BackEnd/sales.csv')  
+    sales_data = pd.read_csv('./sales.csv')  
     for _, row in sales_data.iterrows():
         sale_date = datetime.strptime(row['date'], '%Y-%m-%d')
         new_sale = Sale(
