@@ -3,6 +3,7 @@
 Este projeto implementa uma API para um sistema de e-commerce full-stack, com funcionalidades como cadastro de produtos, categorias e vendas, além de um dashboard para visualização e gerenciamento dos dados. O backend foi desenvolvido utilizando Flask, enquanto o frontend utiliza React. O sistema é completamente full-stack, com o backend implantado no Render e o frontend hospedado na Vercel, proporcionando uma solução robusta e escalável para o gerenciamento de dados e interação com os usuários de maneira eficiente e moderna.
 
 ## Link do Projecto Em produção.
+https://fullstack-dashboard-k952gbw8c-jonesnambundos-projects.vercel.app/
 
 
 ## Tecnologias Utilizadas
