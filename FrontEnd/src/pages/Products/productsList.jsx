@@ -27,14 +27,14 @@ export const ProductsList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedProduct, setSelectedProduct] = useState(null); 
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const context = useContext(MyContext);
 
   const [open, setOpen] = useState(false);
-  const [viewModalOpen, setViewModalOpen] = useState(false); 
+  const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [addModalOpen, setAddModalOpen] = useState(false); 
+  const [addModalOpen, setAddModalOpen] = useState(false);
 
   const handleChange = (event) => {
     setPerPage(event.target.value);
@@ -101,9 +101,9 @@ export const ProductsList = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setProducts([...products, data.product]); 
+      setProducts([...products, data.product]);
 
-      setAddModalOpen(false); 
+      setAddModalOpen(false);
       alert("Produto adicionado com sucesso!");
     } catch (error) {
       console.error("Erro ao adicionar produto:", error);
@@ -113,13 +113,16 @@ export const ProductsList = () => {
 
   const handleEditProduct = async (id, updatedProductData) => {
     try {
-      const response = await fetch(`https://api-ap.onrender.com/products/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedProductData),
-      });
+      const response = await fetch(
+        `https://api-ap.onrender.com/products/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedProductData),
+        }
+      );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -127,7 +130,7 @@ export const ProductsList = () => {
       setProducts(
         products.map((product) => (product.id === id ? data.product : product))
       );
-      setEditModalOpen(false); 
+      setEditModalOpen(false);
       alert("Produto atualizado com sucesso!");
     } catch (error) {
       console.error("Erro ao editar produto:", error);
@@ -137,13 +140,16 @@ export const ProductsList = () => {
 
   const handleRemoveProduct = async (id) => {
     try {
-      const response = await fetch(`https://api-ap.onrender.com/products/${id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `https://api-ap.onrender.com/products/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      setProducts(products.filter((product) => product.id !== id)); 
+      setProducts(products.filter((product) => product.id !== id));
       alert("Produto removido com sucesso!");
     } catch (error) {
       console.error("Erro ao remover produto:", error);
@@ -153,7 +159,7 @@ export const ProductsList = () => {
 
   const handleViewProduct = (product) => {
     setSelectedProduct(product);
-    setViewModalOpen(true); 
+    setViewModalOpen(true);
   };
 
   const handleEditProductModal = (product) => {
@@ -162,8 +168,8 @@ export const ProductsList = () => {
   };
 
   const handleAddProductModal = () => {
-    setSelectedProduct(null); 
-    setAddModalOpen(true); 
+    setSelectedProduct(null);
+    setAddModalOpen(true);
   };
 
   const indexOfLastProduct = currentPage * perPage;
@@ -177,6 +183,18 @@ export const ProductsList = () => {
     setCurrentPage(value);
   };
 
+  const validateProductData = (data) => {
+    if (!data.name || !data.description || !data.price || !data.category_id) {
+      alert("Todos os campos são obrigatórios!");
+      return false;
+    }
+    if (isNaN(data.price) || data.price <= 0) {
+      alert("O preço deve ser um número positivo!");
+      return false;
+    }
+    return true;
+  };
+
   return (
     <>
       <div className="card shadow my-4 border-0 flex-center p-3">
@@ -187,10 +205,7 @@ export const ProductsList = () => {
             <Button className="btn-border btn-sm" onClick={handleExport}>
               <PiExport /> Export
             </Button>
-            <Button
-              className="btn-blue btn-sm"
-              onClick={handleAddProductModal} // Abre o modal de adicionar produto
-            >
+            <Button className="btn-blue btn-sm" onClick={handleAddProductModal}>
               <IoMdAdd /> Add Product
             </Button>
           </div>
@@ -270,7 +285,7 @@ export const ProductsList = () => {
                         <TooltipBox title="Edit" placement="top">
                           <button
                             className="flex items-center justify-center w-[30px] h-[30px] rounded-md hover:bg-blue-500 hover:text-white p-1 transition-all duration-300"
-                            onClick={() => handleEditProductModal(product)} // Abre o modal de edição
+                            onClick={() => handleEditProductModal(product)}
                           >
                             <FiEdit3 />
                           </button>
@@ -332,7 +347,6 @@ export const ProductsList = () => {
         </div>
       </div>
 
-    
       <Drawer
         open={addModalOpen}
         onClose={() => setAddModalOpen(false)}
@@ -370,6 +384,7 @@ export const ProductsList = () => {
                     type="text"
                     className="input"
                     name="productName"
+                    defaultValue={selectedProduct ? selectedProduct.name : ""}
                     required
                   />
                 </div>
@@ -381,6 +396,9 @@ export const ProductsList = () => {
                   <textarea
                     className="input"
                     name="productDescription"
+                    defaultValue={
+                      selectedProduct ? selectedProduct.description : ""
+                    }
                     required
                   />
                 </div>
@@ -388,7 +406,7 @@ export const ProductsList = () => {
             </div>
 
             <div className="row">
-              <div className="col-md-3 col_">
+              <div className="col-md-4 col_">
                 <h4>Price</h4>
                 <div className="form-group">
                   <input
@@ -399,7 +417,7 @@ export const ProductsList = () => {
                   />
                 </div>
               </div>
-              <div className="col-md-3 col_">
+              <div className="col-md-4 col_">
                 <h4>Category ID</h4>
                 <div className="form-group">
                   <input
@@ -410,7 +428,7 @@ export const ProductsList = () => {
                   />
                 </div>
               </div>
-              <div className="col-md-3 col_">
+              <div className="col-md-4 col_">
                 <h4>Brand</h4>
                 <div className="form-group">
                   <input type="text" className="input" name="productBrand" />
@@ -424,7 +442,6 @@ export const ProductsList = () => {
         </form>
       </Drawer>
 
-   
       <Drawer
         open={viewModalOpen}
         onClose={() => setViewModalOpen(false)}
@@ -460,7 +477,6 @@ export const ProductsList = () => {
                   </div>
                 </div>
 
-              
                 <div className="col-span-1">
                   <div className="mb-4">
                     <p className="text-gray-800">
@@ -498,109 +514,110 @@ export const ProductsList = () => {
         </div>
       </Drawer>
 
-      <Drawer
+     <Drawer
         open={editModalOpen}
         onClose={() => setEditModalOpen(false)}
         anchor={"right"}
         className="sidepanel"
       >
-        {selectedProduct && (
-          <form
-            className="form w-[100%] mt-4 relative"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const updatedData = {
-                name: e.target.editProductName.value,
-                description: e.target.editProductDescription.value,
-                price: parseFloat(e.target.editProductPrice.value),
-                category_id: parseInt(e.target.editProductCategoryId.value),
-                brand: e.target.editProductBrand.value,
-              };
-              handleEditProduct(selectedProduct.id, updatedData);
-            }}
-          >
-            <Button className="close_" onClick={() => setEditModalOpen(false)}>
-              <IoMdClose />
-            </Button>
+        <form
+          className="form w-[100%] mt-4 relative"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const formData = {
+              name: e.target.productName.value,
+              description: e.target.productDescription.value,
+              price: parseFloat(e.target.productPrice.value),
+              category_id: parseInt(e.target.productCategoryId.value),
+              brand: e.target.productBrand.value,
+            };
+            if (selectedProduct) {
+              handleEditProduct(selectedProduct.id, formData);
+            }
+          }}
+        >
+          <Button className="close_" onClick={() => setEditModalOpen(false)}>
+            <IoMdClose />
+          </Button>
 
-            <div className="card shadow border-0 flex-center p-6">
-              <h2 className="font-semibold text-2xl text-gray-800 mb-6">
-                Edit Product
-              </h2>
+          <div className="card shadow border-0 flex-center p-3">
+            <h2 className="font-weight-bold text-black/70 mb-4">
+              Edit Product
+            </h2>
 
-              <div className="row">
-                <div className="col-md-12 col_">
-                  <h4 className="text-lg font-medium text-gray-700 mb-2">
-                    Product Name
-                  </h4>
-                  <div className="form-group">
-                    <input
-                      type="text"
-                      className="input p-3 border border-gray-300 rounded-lg w-full text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      name="editProductName"
-                      defaultValue={selectedProduct.name}
-                      required
-                    />
-                  </div>
+            <div className="row">
+              <div className="col-md-12 col_">
+                <h4>Product Name</h4>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    className="input"
+                    name="productName"
+                    defaultValue={selectedProduct ? selectedProduct.name : ""}
+                    required
+                  />
                 </div>
               </div>
 
-              <div className="row mt-6">
-                <div className="col-md-4 col_">
-                  <h4 className="text-lg font-medium text-gray-700 mb-2">
-                    Price
-                  </h4>
-                  <div className="form-group">
-                    <input
-                      type="number"
-                      className="input p-3 border border-gray-300 rounded-lg w-full text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      name="editProductPrice"
-                      defaultValue={selectedProduct.price}
-                      required
-                    />
-                  </div>
+              <div className="col-md-12 col_">
+                <h4>Product Description</h4>
+                <div className="form-group">
+                  <textarea
+                    className="input"
+                    name="productDescription"
+                    defaultValue={
+                      selectedProduct ? selectedProduct.description : ""
+                    }
+                    required
+                  />
                 </div>
-
-                <div className="col-md-4 col_">
-                  <h4 className="text-lg font-medium text-gray-700 mb-2">
-                    Category ID
-                  </h4>
-                  <div className="form-group">
-                    <input
-                      type="number"
-                      className="input p-3 border border-gray-300 rounded-lg w-full text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      name="editProductCategoryId"
-                      defaultValue={selectedProduct.category_id}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="col-md-4 col_">
-                  <h4 className="text-lg font-medium text-gray-700 mb-2">
-                    Brand
-                  </h4>
-                  <div className="form-group">
-                    <input
-                      type="text"
-                      className="input p-3 border border-gray-300 rounded-lg w-full text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      name="editProductBrand"
-                      defaultValue={selectedProduct.brand}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="mt-6">
-                <button
-                  type="submit"
-                  className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
-                >
-                  Save Changes
-                </button>
               </div>
             </div>
-          </form>
-        )}
+
+            <div className="row">
+              <div className="col-md-3 col_">
+                <h4>Price</h4>
+                <div className="form-group">
+                  <input
+                    type="number"
+                    className="input"
+                    name="productPrice"
+                    defaultValue={selectedProduct ? selectedProduct.price : ""}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="col-md-3 col_">
+                <h4>Category ID</h4>
+                <div className="form-group">
+                  <input
+                    type="number"
+                    className="input"
+                    name="productCategoryId"
+                    defaultValue={
+                      selectedProduct ? selectedProduct.category_id : ""
+                    }
+                    required
+                  />
+                </div>
+              </div>
+              <div className="col-md-3 col_">
+                <h4>Brand</h4>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    className="input"
+                    name="productBrand"
+                    defaultValue={selectedProduct ? selectedProduct.brand : ""}
+                  />
+                </div>
+              </div>
+            </div>
+            <Button type="submit" className="btn-blue btn-lg">
+              Edit Product
+            </Button>
+          </div>
+        </form>
       </Drawer>
     </>
   );

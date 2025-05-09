@@ -1,13 +1,11 @@
 import React, { useEffect, useState, useContext } from "react";
 import { MyContext } from "../../App";
-import { Button, Select, MenuItem, Pagination } from "@mui/material";
+import { Button, Select, MenuItem, Pagination, Drawer } from "@mui/material";
 import { FiEdit3 } from "react-icons/fi";
-import { MdOutlineRemoveRedEye } from "react-icons/md";
-import { MdOutlineDeleteOutline } from "react-icons/md";
+import { MdOutlineRemoveRedEye, MdOutlineDeleteOutline } from "react-icons/md";
+import TooltipBox from "@mui/material/Tooltip";
 import { PiFileCsv } from "react-icons/pi";
 import { IoMdAdd, IoMdClose } from "react-icons/io";
-
-const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 export const ProductSales = () => {
   const [sales, setSales] = useState([]);
@@ -21,16 +19,20 @@ export const ProductSales = () => {
   const [selectedSale, setSelectedSale] = useState(null);
   const context = useContext(MyContext);
 
+  const formatDate = (isoDate) => {
+    if (!isoDate) return "";
+    const [year, month, day] = isoDate.split("-");
+    return `${day}/${month}/${year}`;
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
     context.setIsHeaderFooterShow(false);
-
     const fetchSales = async () => {
       try {
         const response = await fetch("https://api-ap.onrender.com/sales");
-        if (!response.ok) {
+        if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
-        }
         const data = await response.json();
         setSales(data);
         setLoading(false);
@@ -40,7 +42,6 @@ export const ProductSales = () => {
         console.error("Erro ao buscar vendas:", e);
       }
     };
-
     fetchSales();
   }, [context]);
 
@@ -70,14 +71,11 @@ export const ProductSales = () => {
     try {
       const response = await fetch(`https://api-ap.onrender.com/sales/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedSaleData),
       });
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
-      }
       const data = await response.json();
       setSales(sales.map((sale) => (sale.id === id ? data.sale : sale)));
       setEditModalOpen(false);
@@ -123,31 +121,20 @@ export const ProductSales = () => {
     const fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.accept = ".csv";
-
     fileInput.onchange = async (event) => {
       const file = event.target.files[0];
       if (file) {
         const formData = new FormData();
         formData.append("file", file);
-
         try {
           const response = await fetch(
-            "https://api-ap.onrender.com/sales/upload_csv",
-            {
-              method: "POST",
-              body: formData,
-            }
+            "http://127.0.0.1:5000/sales/upload_csv",
+            { method: "POST", body: formData }
           );
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(
-              `HTTP error! status: ${response.status}, message: ${
-                errorData?.message || "Erro ao importar vendas."
-              }`
-            );
-          }
+          if (!response.ok)
+            throw new Error(`HTTP error! status: ${response.status}`);
           const data = await response.json();
-          setSales(data.sales); 
+          setSales(data.sales);
           alert("Vendas importadas com sucesso do CSV!");
         } catch (error) {
           console.error("Erro ao importar vendas do CSV:", error);
@@ -155,16 +142,45 @@ export const ProductSales = () => {
         }
       }
     };
-
     fileInput.click();
   };
 
   const indexOfLastSale = currentPage * perPage;
   const indexOfFirstSale = indexOfLastSale - perPage;
   const currentSales = sales.slice(indexOfFirstSale, indexOfLastSale);
+  const handlePageChange = (event, value) => setCurrentPage(value);
 
-  const handlePageChange = (event, value) => {
-    setCurrentPage(value);
+  const handleSubmitAdd = (e) => {
+    e.preventDefault();
+    const now = new Date();
+    const isoDate = e.target.date.value;
+    const dateTimeString = `${isoDate} ${now.toLocaleTimeString("en-US", {
+      hour12: false,
+    })}`;
+
+    const formData = {
+      product_id: parseInt(e.target.productId.value),
+      quantity: parseInt(e.target.quantity.value),
+      total_price: parseFloat(e.target.totalPrice.value),
+      date: dateTimeString,
+    };
+    handleAddSale(formData);
+  };
+
+  const handleSubmitEdit = (e) => {
+    e.preventDefault();
+    const now = new Date();
+    const isoDate = e.target.date.value;
+    const dateTimeString = `${isoDate} ${now.toLocaleTimeString("en-US", {
+      hour12: false,
+    })}`;
+    const formData = {
+      product_id: parseInt(e.target.productId.value),
+      quantity: parseInt(e.target.quantity.value),
+      total_price: parseFloat(e.target.totalPrice.value),
+      date: dateTimeString,
+    };
+    handleEditSale(selectedSale.id, formData);
   };
 
   return (
@@ -172,6 +188,7 @@ export const ProductSales = () => {
       <div className="card shadow my-4 border-0 flex-center p-3">
         <div className="flex items-center justify-between">
           <h1 className="font-weight-bold mb-0">Sales</h1>
+          
           <div className="ml-auto flex items-center gap-3">
             <Button className="btn-border btn-sm" onClick={handleImportCsv}>
               <PiFileCsv /> Upload CSV
@@ -185,11 +202,11 @@ export const ProductSales = () => {
 
       <div className="card shadow my-4 border-0">
         <div className="table-responsive mb-2">
-          <table className="table w-full table-striped text-sm">
-            <thead className="thead-light bg-gray-100 text-gray-700">
+          <table className="table w-full table-striped">
+            <thead className="bg-slate-200 text-gray-700">
               <tr>
                 <th className="py-2 px-4 text-left">ID</th>
-                <th className="py-2 px-4 text-left">PRODUCT</th>
+
                 <th className="py-2 px-4 text-left">QUANTITY</th>
                 <th className="py-2 px-4 text-left">PRICE</th>
                 <th className="py-2 px-4 text-left">DATE</th>
@@ -214,30 +231,37 @@ export const ProductSales = () => {
                 currentSales.map((sale) => (
                   <tr key={sale.id} className="border-t border-gray-200">
                     <td className="py-3 px-4">{sale.id}</td>
-                    <td className="py-3 px-4">{sale.product_name}</td>
                     <td className="py-3 px-4">{sale.quantity}</td>
                     <td className="py-3 px-4">{sale.total_price}</td>
                     <td className="py-3 px-4">{sale.date}</td>
                     <td className="py-3 px-4">
                       <div className="actions flex items-center gap-2">
-                        <button
-                          className="flex items-center justify-center text-blue-500 hover:text-blue-700"
-                          onClick={() => handleEditSaleModal(sale)}
-                        >
-                          <FiEdit3 />
-                        </button>
-                        <button
-                          className="flex items-center justify-center text-green-500 hover:text-green-700"
-                          onClick={() => handleViewSale(sale)}
-                        >
-                          <MdOutlineRemoveRedEye />
-                        </button>
-                        <button
-                          className="flex items-center justify-center text-red-500 hover:text-red-700"
-                          onClick={() => handleRemoveSale(sale.id)}
-                        >
-                          <MdOutlineDeleteOutline />
-                        </button>
+                        <TooltipBox title="Edit" placement="top">
+                          <button
+                            className="flex items-center justify-center w-[30px] h-[30px] rounded-md hover:bg-blue-500 hover:text-white p-1 transition-all duration-300"
+                            onClick={() => handleEditSaleModal(sale)}
+                          >
+                            <FiEdit3 />
+                          </button>
+                        </TooltipBox>
+
+                        <TooltipBox title="View" placement="top">
+                          <button
+                            className="flex items-center justify-center w-[30px] h-[30px] rounded-md hover:bg-green-500 hover:text-white p-1 transition-all duration-300"
+                            onClick={() => handleViewSale(sale)}
+                          >
+                            <MdOutlineRemoveRedEye />
+                          </button>
+                        </TooltipBox>
+
+                        <TooltipBox title="Remove" placement="top">
+                          <button
+                            className="flex items-center justify-center w-[30px] h-[30px] rounded-md hover:bg-red-500 hover:text-white p-1 transition-all duration-300"
+                            onClick={() => handleRemoveSale(sale.id)}
+                          >
+                            <MdOutlineDeleteOutline />
+                          </button>
+                        </TooltipBox>
                       </div>
                     </td>
                   </tr>
@@ -276,6 +300,177 @@ export const ProductSales = () => {
           />
         </div>
       </div>
+
+      <Drawer
+        open={viewModalOpen}
+        onClose={() => setViewModalOpen(false)}
+        anchor="right"
+        className="sidepanel"
+      >
+        <form className="form w-full mt-4 relative">
+          <Button className="close_" onClick={() => setViewModalOpen(false)}>
+            <IoMdClose />
+          </Button>
+          <div className="card shadow border-0 flex-center p-3">
+            <h2 className="font-weight-bold text-black/70 mb-4">
+              Sale Details
+            </h2>
+            {selectedSale && (
+              <div>
+                <div className="form-group">
+                  <label>ID</label>
+                  <input
+                    type="text"
+                    className="input"
+                    name="id"
+                    value={selectedSale.id}
+                    disabled
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Quantity</label>
+                  <input
+                    type="number"
+                    className="input"
+                    name="quantity"
+                    value={selectedSale.quantity}
+                    disabled
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Total Price</label>
+                  <input
+                    type="number"
+                    className="input"
+                    name="totalPrice"
+                    value={selectedSale.total_price}
+                    disabled
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Date</label>
+                  <input
+                    type="date"
+                    className="input"
+                    name="date"
+                    value={selectedSale.date?.split(" ")[0]}
+                    disabled
+                  />
+                </div>
+              </div>
+            )}
+            <Button
+              className="btn-blue"
+              onClick={() => setViewModalOpen(false)}
+            >
+              Close
+            </Button>
+          </div>
+        </form>
+      </Drawer>
+      <Drawer
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        anchor="right"
+        className="sidepanel"
+      >
+        <form className="form w-full mt-4 relative" onSubmit={handleSubmitEdit}>
+          <Button className="close_" onClick={() => setEditModalOpen(false)}>
+            <IoMdClose />
+          </Button>
+          <div className="card shadow border-0 flex-center p-3">
+            <h2 className="font-weight-bold text-black/70 mb-4">Edit Sale</h2>
+            <div className="form-group">
+              <label>Product ID</label>
+              <input
+                type="number"
+                className="input"
+                name="productId"
+                defaultValue={selectedSale?.product_id}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Quantity</label>
+              <input
+                type="number"
+                className="input"
+                name="quantity"
+                defaultValue={selectedSale?.quantity}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Total Price</label>
+              <input
+                type="number"
+                className="input"
+                name="totalPrice"
+                defaultValue={selectedSale?.total_price}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Date</label>
+              <input
+                type="date"
+                className="input"
+                name="date"
+                defaultValue={selectedSale?.date?.split(" ")[0]}
+                required
+              />
+            </div>
+            <Button type="submit" className="btn-blue btn-lg">
+              Save Changes
+            </Button>
+          </div>
+        </form>
+      </Drawer>
+
+      <Drawer
+        open={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        anchor="right"
+        className="sidepanel"
+      >
+        <form className="form w-full mt-4 relative" onSubmit={handleSubmitAdd}>
+          <Button className="close_" onClick={() => setAddModalOpen(false)}>
+            <IoMdClose />
+          </Button>
+          <div className="card shadow border-0 flex-center p-3">
+            <h2 className="font-weight-bold text-black/70 mb-4">Add Sale</h2>
+            <div className="form-group">
+              <label>Product ID</label>
+              <input
+                type="number"
+                className="input"
+                name="productId"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Quantity</label>
+              <input type="number" className="input" name="quantity" required />
+            </div>
+            <div className="form-group">
+              <label>Total Price</label>
+              <input
+                type="number"
+                className="input"
+                name="totalPrice"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Date</label>
+              <input type="date" className="input" name="date" required />
+            </div>
+            <Button type="submit" className="btn-blue btn-lg">
+              Add Sale
+            </Button>
+          </div>
+        </form>
+      </Drawer>
     </>
   );
 };

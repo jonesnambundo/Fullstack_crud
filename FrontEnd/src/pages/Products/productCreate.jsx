@@ -229,22 +229,10 @@ export const ProductCreate = () => {
                 />
               </div>
             </div>
+          </div>
 
-            <div className="col-md-3 col_">
-              <h4>ID</h4>
-              <div className="form-group">
-                <input
-                  type="number"
-                  className="input"
-                  name="id"
-                  value={id}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="col-md-3 col_">
+          <div className="row">
+            <div className="col-md-4 col_">
               <h4>Price</h4>
               <div className="form-group">
                 <input
@@ -258,7 +246,7 @@ export const ProductCreate = () => {
               </div>
             </div>
 
-            <div className="col-md-3 col_">
+            <div className="col-md-4 col_">
               <h4>Category_ID</h4>
               <div className="form-group">
                 <input
@@ -272,7 +260,7 @@ export const ProductCreate = () => {
               </div>
             </div>
 
-            <div className="col-md-3 col_">
+            <div className="col-md-4 col_">
               <h4>Brand</h4>
               <div className="form-group">
                 <input

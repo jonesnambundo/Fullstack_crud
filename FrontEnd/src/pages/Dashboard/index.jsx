@@ -3,10 +3,12 @@ import Papa from "papaparse";
 import DashboardBox from "./components/dashboardBox";
 import { FaUserCircle } from "react-icons/fa";
 import { IoMdCart } from "react-icons/io";
-import { MdShoppingBag } from "react-icons/md";
+import { MdProductionQuantityLimits, MdShoppingBag } from "react-icons/md";
 
 import { MyContext } from "../../App";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { ProductsList } from "../Products/productsList";
+import { ProductSales } from "../Products/productsSales";
 
 
 export const Dashboard = () => {
@@ -85,7 +87,7 @@ export const Dashboard = () => {
           />
         </div>
 
-        <div className="row mt-4 mb-2">
+        <div className="row mt-4">
           <div className="col-md-6">
             <div className="card shadow p-4 border-0">
               <h2 className="mb-4 font-bold">Quantidade Vendida por Mês</h2>
@@ -101,9 +103,8 @@ export const Dashboard = () => {
               </ResponsiveContainer>
             </div>
           </div>
-
         
-          <div className="col-md-6 mb-4">
+          <div className="col-md-6">
             <div className="card shadow p-4 border-0">
               <h2 className="mb-4 font-bold">Lucro por Mês</h2>
               <ResponsiveContainer width="100%" height={300}>
@@ -125,8 +126,10 @@ export const Dashboard = () => {
             </div>
           </div>
         </div>
+         <ProductsList />
+         <ProductSales />
 
-        <div className="row">
+        <div className="row mb-4">
           <div className="col-md-12">
             <div className="card shadow p-4 border-0">
               <h2 className="mb-4 font-bold">Quantidade e Lucro Combinados</h2>

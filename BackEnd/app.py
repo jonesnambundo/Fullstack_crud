@@ -5,16 +5,16 @@ import json
 from io import StringIO
 from datetime import datetime
 import csv
-from flask_cors import CORS  
+from flask_cors import CORS
+import os
 
-from sqlalchemy import func
-
-# Inicialização do app Flask
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+
+# Configuração do banco de dados (SQLite)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(os.getcwd(), 'database.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-CORS(app)  
+CORS(app)
 
 # Modelos do banco de dados
 
@@ -60,7 +60,7 @@ with app.app_context():
             db.session.add(Category(id=id_, name=name))
         db.session.commit()
         
-    sales_data = pd.read_csv('BackEnd/sales.csv')  
+    sales_data = pd.read_csv('./BackEnd/sales.csv')  
     for _, row in sales_data.iterrows():
         sale_date = datetime.strptime(row['date'], '%Y-%m-%d')
         new_sale = Sale(
@@ -72,6 +72,7 @@ with app.app_context():
         db.session.add(new_sale)
     db.session.commit()
 
+# Função auxiliar para padronizar respostas JSON
 def gera_response(status, nome_do_conteudo, conteudo, mensagem=False):
     body = {}
     body[nome_do_conteudo] = conteudo
@@ -79,7 +80,7 @@ def gera_response(status, nome_do_conteudo, conteudo, mensagem=False):
         body["mensagem"] = mensagem
     return Response(json.dumps(body), status=status, mimetype="application/json")
 
-# Endpoint para obter todas as categorias
+# Endpoints de Categoria
 @app.route("/categories", methods=["GET"])
 def get_categories():
     categories = Category.query.all()
@@ -94,7 +95,7 @@ def create_category():
     db.session.commit()
     return gera_response(201, "category", {'id': new_cat.id, 'name': new_cat.name}, "Categoria criada")
 
-
+# Endpoints de Produto
 # Criar produto
 @app.route("/products", methods=["POST"])
 def create_product():
@@ -138,14 +139,12 @@ def list_products():
     category_id = request.args.get('category_id', type=int)
 
     products_query = Product.query
-
     if query:
         products_query = products_query.filter(
             Product.name.ilike(f"%{query}%") |
             Product.description.ilike(f"%{query}%") |
             Product.brand.ilike(f"%{query}%")
         )
-
     if category_id:
         products_query = products_query.filter_by(category_id=category_id)
 
@@ -153,18 +152,13 @@ def list_products():
 
     data = []
     for p in products:
-        total_sales = db.session.query(
-            func.sum(Sale.total_price), func.sum(Sale.quantity)
-        ).filter_by(product_id=p.id).first()
         data.append({
             'id': p.id,
             'name': p.name,
             'description': p.description,
             'price': p.price,
             'category': getattr(p.category, "name", "Categoria não encontrada"),
-            'brand': p.brand,
-            'total_sales': total_sales[0] or 0,
-            'quantity_sold': total_sales[1] or 0
+            'brand': p.brand
         })
     return jsonify(data)
 
@@ -185,78 +179,27 @@ def upload_products_csv():
     db.session.commit()
     return gera_response(201, "products", df.to_dict(orient='records'), "Produtos inseridos via CSV")
 
-
 @app.route("/", methods=["GET"])
 def welcome():
     return "Bem-vindo à API! Tudo está funcionando corretamente."
 
-# Rota para criar uma venda
-@app.route("/sales", methods=["POST"])
-def create_sale():
-    data = request.get_json()
-
-    if not data or 'product_id' not in data or 'quantity' not in data or 'total_price' not in data:
-        return gera_response(400, "error", None, "Dados de venda incompletos.")
-
-    try:
-        product_id = int(data['product_id'])
-        quantity = int(data['quantity'])
-        total_price = float(data['total_price'])
-    except ValueError:
-        return gera_response(400, "error", None, "Valores inválidos para product_id, quantity ou total_price.")
-
-    product = Product.query.get(product_id)
-    if not product:
-        return gera_response(404, "error", None, "Produto não encontrado.")
-
-    date_str = data.get('date', datetime.utcnow().strftime('%Y-%m-%d'))
-    try:
-        sale_date = datetime.strptime(date_str, '%Y-%m-%d')
-    except ValueError:
-        return gera_response(400, "error", None, "Formato de data inválido.")
-
-    new_sale = Sale(
-        product_id=product_id,
-        quantity=quantity,
-        total_price=total_price,
-        date=sale_date
+# Download de produtos para arquivo CSV
+@app.route("/products/download_csv", methods=["GET"])
+def download_products_csv():
+    products = Product.query.all()
+    csv_data = StringIO()
+    writer = csv.writer(csv_data)
+    writer.writerow(['id', 'name', 'description', 'price', 'category_id', 'brand'])
+    for p in products:
+        writer.writerow([p.id, p.name, p.description, p.price, p.category_id, p.brand])
+    csv_data.seek(0)
+    return Response(
+        csv_data.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-disposition": "attachment; filename=products.csv"}
     )
 
-    try:
-        db.session.add(new_sale)
-        db.session.commit()
-        return gera_response(201, "sale", {'id': new_sale.id}, "Venda criada com sucesso.")
-    except Exception as e:
-        db.session.rollback()
-        return gera_response(500, "error", None, f"Erro ao salvar a venda: {str(e)}")
-
-
-# Editar venda
-@app.route("/sales/<int:id>", methods=["PUT"])
-def update_sale(id):
-    data = request.json
-    
-    sale = Sale.query.get_or_404(id)
-    
-    sale.product_id = data.get('product_id', sale.product_id)
-    sale.quantity = data.get('quantity', sale.quantity)
-    sale.total_price = data.get('total_price', sale.total_price)
-    sale.date = data.get('date', sale.date) 
-    
-    db.session.commit()
-    
-    return gera_response(200, "sale", {'id': sale.id}, "Venda atualizada com sucesso")
-
-# Deletar venda
-@app.route("/sales/<int:id>", methods=["DELETE"])
-def delete_sale(id):
-    sale = Sale.query.get_or_404(id)  
-    
-    db.session.delete(sale) 
-    db.session.commit() 
-    
-    return gera_response(200, "sale", {'id': id}, "Venda removida com sucesso")
-
+# Endpoints de Vendas
 # Ver lista de vendas
 @app.route("/sales", methods=["GET"])
 def list_sales():
@@ -277,31 +220,116 @@ def list_sales():
         data.append({
             'id': sale.id,
             'product_id': sale.product_id,
-            'product_name': product.name if product else 'Produto não encontrado',
             'quantity': sale.quantity,
             'total_price': sale.total_price,
             'date': sale.date.strftime('%Y-%m-%d %H:%M:%S')
         })
     return jsonify(data)
 
+
+# Criar venda
+@app.route("/sales", methods=["POST"])
+def create_sale():
+    data = request.json
+    
+    try:
+        sale_date = datetime.strptime(data['date'], "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        return gera_response(400, "sale", {}, "Data inválida. Use o formato AAAA-MM-DD HH:MM:SS.")
+    
+    new_sale = Sale(
+        product_id=data['product_id'],
+        quantity=data['quantity'],
+        total_price=data['total_price'],
+        date=sale_date
+    )
+    
+    db.session.add(new_sale)
+    db.session.commit()
+    
+    product = Product.query.get(new_sale.product_id)
+
+    response_data = {
+        "id": new_sale.id,
+        "product_id": new_sale.product_id,
+        "quantity": new_sale.quantity,
+        "total_price": new_sale.total_price,
+        "date": new_sale.date.strftime("%Y-%m-%d %H:%M:%S")  # Formata a data para o formato correto
+    }
+    
+    return gera_response(201, "sale", response_data, "Venda criada com sucesso")
+
+# Editar venda
+@app.route("/sales/<int:id>", methods=["PUT"])
+def update_sale(id):
+    data = request.json
+    
+    sale = Sale.query.get_or_404(id)
+    
+    if 'date' in data:
+        try:
+            sale_date = datetime.strptime(data['date'], "%Y-%m-%d %H:%M:%S")
+            sale.date = sale_date
+        except ValueError:
+            return gera_response(400, "sale", {}, "Data inválida. Use o formato AAAA-MM-DD HH:MM:SS.")
+   
+    sale.product_id = data.get('product_id', sale.product_id)
+    sale.quantity = data.get('quantity', sale.quantity)
+    sale.total_price = data.get('total_price', sale.total_price)
+
+    # Commit da transação
+    db.session.commit()
+    
+    product = Product.query.get(sale.product_id)
+    response_data = {
+        "id": sale.id,
+        "product_id": sale.product_id,
+        "quantity": sale.quantity,
+        "total_price": sale.total_price,
+        "date": sale.date.strftime("%Y-%m-%d %H:%M:%S")  
+    }
+    
+    return gera_response(200, "sale", response_data, "Venda atualizada com sucesso")
+
+# Deletar venda
+@app.route("/sales/<int:id>", methods=["DELETE"])
+def delete_sale(id):
+    sale = Sale.query.get_or_404(id)
+    
+    db.session.delete(sale)
+    db.session.commit()
+    
+    return gera_response(200, "sale", {'id': id}, "Venda deletada com sucesso")
+
 # Upload de vendas via CSV
 @app.route("/sales/upload_csv", methods=["POST"])
 def upload_sales_csv():
     file = request.files['file']
-    df = pd.read_csv(file)
+    
+    try:
+        df = pd.read_csv(file)
+    except Exception as e:
+        return gera_response(400, "sale", {}, f"Erro ao ler o CSV: {str(e)}")
+    
+
     for _, row in df.iterrows():
+        try:
+            sale_date = datetime.strptime(row['date'], "%Y-%m-%d")
+        except ValueError:
+            return gera_response(400, "sale", {}, "Data inválida no CSV. Use o formato AAAA-MM-DD.")
+        
         new_sale = Sale(
             product_id=row['product_id'],
             quantity=row['quantity'],
             total_price=row['total_price'],
-            date=row['date']
+            date=sale_date
         )
         db.session.add(new_sale)
     db.session.commit()
+    
     return gera_response(201, "sales", df.to_dict(orient='records'), "Vendas inseridas via CSV")
 
 # Download de vendas para arquivo CSV
-
 @app.route("/sales/download_csv", methods=["GET"])
 def download_sales_csv():
     sales = Sale.query.all()
@@ -317,26 +345,10 @@ def download_sales_csv():
         headers={"Content-disposition": "attachment; filename=sales.csv"}
     )
 
-# Download de produtos para arquivo CSV
-
-@app.route("/products/download_csv", methods=["GET"])
-def download_products_csv():
-    products = Product.query.all()
-    csv_data = StringIO()
-    writer = csv.writer(csv_data)
-    writer.writerow(['id', 'name', 'description', 'price', 'category_id', 'brand'])
-    for p in products:
-        writer.writerow([p.id, p.name, p.description, p.price, p.category_id, p.brand])
-    csv_data.seek(0)
-    return Response(
-        csv_data.getvalue(),
-        mimetype="text/csv",
-        headers={"Content-disposition": "attachment; filename=products.csv"}
-    )
-
+# Vendas - Resumo de vendas e lucro por período
 @app.route("/sales/summary", methods=["GET"])
 def sales_summary():
-    group_by = request.args.get('group_by', 'month') 
+    group_by = request.args.get('group_by', 'month')  # 'week', 'month', 'year'
     sales = Sale.query.all()
     summary = {}
     for sale in sales:
@@ -352,8 +364,5 @@ def sales_summary():
         summary[key]['profit'] += sale.total_price
     return jsonify(summary)
 
-
-# Execução do servidor Flask
-# -------------------
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)

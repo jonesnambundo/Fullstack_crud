@@ -1,16 +1,18 @@
 # E-commerce API & Dashboard
 
-Este projeto implementa uma API para um sistema de e-commerce com funcionalidades como cadastro de produtos, categorias e vendas, bem como um dashboard para visualização e gerenciamento dos dados. O backend foi desenvolvido com Flask, e o frontend utiliza React.
+Este projeto implementa uma API para um sistema de e-commerce full-stack, com funcionalidades como cadastro de produtos, categorias e vendas, além de um dashboard para visualização e gerenciamento dos dados. O backend foi desenvolvido utilizando Flask, enquanto o frontend utiliza React. O sistema é completamente full-stack, com o backend implantado no Render e o frontend hospedado na Vercel, proporcionando uma solução robusta e escalável para o gerenciamento de dados e interação com os usuários de maneira eficiente e moderna.
+
+## Link do Projecto Em produção.
+
 
 ## Tecnologias Utilizadas
 
-- **Backend**: Flask, Flask-SQLAlchemy, Flask-CORS, pandas, SQLAlchemy
+- **Backend**: Flask, Flask-SQLAlchemy, Flask-CORS, pandas, SQLAlchemy, Render (para deploy)
 - **Frontend**: React, Material-UI, React Router, Axios
 - **Banco de Dados**: SQLite
 - **Outras Bibliotecas**: PapaParse (para parsing de CSV), React Icons, React-Redux
 
 ## Funcionalidades
-
 ### Backend (API)
 
 1. **Produtos**:
@@ -23,7 +25,7 @@ Este projeto implementa uma API para um sistema de e-commerce com funcionalidade
 3. **Vendas**:
    - CRUD de vendas: Criar, Editar, Deletar e Listar vendas.
    - Importação e exportação de vendas via CSV.
-   - Resumo de vendas por mês, semana ou ano.
+   - Resumo de vendas por mês, semana ou ano, gráficos.
    
 4. **Endpoints**:
    - `/products`: Para listar, criar, editar e deletar produtos.
@@ -36,7 +38,6 @@ Este projeto implementa uma API para um sistema de e-commerce com funcionalidade
    - `/sales/download_csv`: Para exportar as vendas para CSV.
 
 ### Frontend (Dashboard)
-
 1. **Dashboard de Vendas**:
    - Visualização das vendas totais e quantidade de produtos vendidos.
    - Gráficos para exibição de vendas e lucro mensal.
@@ -57,22 +58,35 @@ Este projeto implementa uma API para um sistema de e-commerce com funcionalidade
      ![Image](https://github.com/user-attachments/assets/e859f2b1-e80f-4a70-b39e-f6d1725d9113)
 
 ---
-## Como Rodar o Projeto
-Clonar o repositório do GitHub:
+\section*{Como Rodar o Projeto}
 
-git clone https://github.com/jonesnambundo/Fullstack_crud.git
+\begin{enumerate}
+    \item Clonar o repositório do GitHub:
+    \begin{verbatim}
+    git clone https://github.com/jonesnambundo/Fullstack_crud.git
+    \end{verbatim}
+    
+    \item Entrar na pasta do Frontend:
+    \begin{verbatim}
+    cd FrontEnd
+    \end{verbatim}
+    
+    \item Instalar as dependências do frontend:
+    \begin{verbatim}
+    npm i
+    \end{verbatim}
+    
+    \item Iniciar o servidor de desenvolvimento do frontend:
+    \begin{verbatim}
+    npm run dev
+    \end{verbatim}
+\end{enumerate}
 
-Entrar na pasta do Frontend:
-cd FrontEnd
-
-Instalar as dependências do frontend:
-npm i
-
-Iniciar o servidor de desenvolvimento do frontend:
-npm run dev
 
 ### Backend
-Criar um ambiente virtual para o Python:python3 
+Criar um ambiente virtual para o Python:
+
+- python 
 -m venv venv
 
 Ativar o ambiente virtual:
