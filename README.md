@@ -58,44 +58,41 @@ Este projeto implementa uma API para um sistema de e-commerce full-stack, com fu
      ![Image](https://github.com/user-attachments/assets/e859f2b1-e80f-4a70-b39e-f6d1725d9113)
 
 ---
-\section*{Como Rodar o Projeto}
+## Como Rodar o Projeto
 
-\begin{enumerate}
-    \item Clonar o repositório do GitHub:
-    \begin{verbatim}
+   Clonar o repositório do GitHub:
+   
     git clone https://github.com/jonesnambundo/Fullstack_crud.git
-    \end{verbatim}
+ 
+ ## Entrar na pasta do Frontend:
     
-    \item Entrar na pasta do Frontend:
-    \begin{verbatim}
     cd FrontEnd
-    \end{verbatim}
     
-    \item Instalar as dependências do frontend:
-    \begin{verbatim}
-    npm i
-    \end{verbatim}
-    
-    \item Iniciar o servidor de desenvolvimento do frontend:
-    \begin{verbatim}
-    npm run dev
-    \end{verbatim}
-\end{enumerate}
+ ## Instalar as dependências do frontend:
 
+    npm i
+   
+## Iniciar o servidor de desenvolvimento do frontend:
+
+    npm run dev
+   
 
 ### Backend
-Criar um ambiente virtual para o Python:
+## Criar um ambiente virtual para o Python:
 
 - python 
 -m venv venv
 
-Ativar o ambiente virtual:
+## Ativar o ambiente virtual:
+
 .\venv\Scripts\activate
 
-Instalar as dependências do backend:
+## Instalar as dependências do backend:
+
 pip install -r requirements.txt
 
-Rodar o servidor do Flask:
+## Rodar o servidor do Flask:
+
 python app.py
 O servidor estará disponível em http://127.0.0.1:5000/.
 
