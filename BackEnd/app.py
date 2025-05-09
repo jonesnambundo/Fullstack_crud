@@ -14,7 +14,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(os.getcwd(), 'database.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-CORS(app)
+
+CORS(app, origins=["https://fullstack-dashboard-gi3yl3a1t-jonesnambundos-projects.vercel.app/"])
 
 # Modelos do banco de dados
 
